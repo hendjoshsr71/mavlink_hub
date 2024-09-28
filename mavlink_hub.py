@@ -1,5 +1,40 @@
 #!/usr/bin/env python3
 
+# Plan
+# Requirement: Receive Serial Data inside MAVLink  tunnel Packets then unpack it and send it over serial port
+#  
+# To Do:
+# 1. Only check  and possibly MAVLink tunnel packets
+# 2. Check timestamp to the MAVLink tunnel packets
+#    - compute latency, jitter, etc.
+#    - Log latency, jitter, dropped packets, etc.
+#
+# ArduPilot Firmware Side
+# 1. Add timestamp to MAVLink tunnel packets
+#
+#
+# Future:
+# 1. Gather the serial port 
+# 1. Add webpage to select the serial port and baudrate, etc.
+#   - 
+# 2. Add webpage to select the MAVLink tunnel type
+# 
+# IP address, port, and connection type UDP/TCP
+# 
+# Eventually:
+# 1. Gather mavlink parameters from AP on the DSP
+#   - Check which serial ports use ethernet bridge
+#   - Set baud rate of python code to the same as the AP 
+# 2, Create map for I/O ports between APP side and DSP (SLPI) side
+#   - Serial
+#       * Serial port 1 -> /dev/ttyHS1
+#       * could be used to go serial to ethernet (however better to just use the usb ports for that. IE map the bridge to t)
+#   - I2C
+#   - USB ports: as a very litteral bridge the tunnel wouldn't be needed. Instead use the mav-router project
+#   - SPI : could be used to go direct to a SPI to CAN transceiver 
+
+# 1. Remove mavlink tunnel concept instead use IP address and port directly
+
 from __future__ import print_function
 
 from pymavlink import mavutil
@@ -97,6 +132,9 @@ class MAVLinkHub():
                     if j.addr == conn.addr:
                         continue
 #                    print("  Resending message on connection %s" % (j.addr,))
+
+                    # Only write out the correct MAVLink tunnel message type
+                    #  
                     j.mav.write(m.get_msgbuf())
 
                 if self.tlog is not None:
